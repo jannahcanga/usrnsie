@@ -173,6 +173,26 @@
     }
   }
 
+  // ---------- shared Reference-B style progress card (curved line + glow) ----------
+  const PROGRESS_CURVE_PATH = "M5,50 C90,10 210,10 295,50";
+
+  function progressCurveSvg(status) {
+    return `
+      <svg class="progress-curve" viewBox="0 0 300 70" preserveAspectRatio="none">
+        <path class="track" d="${PROGRESS_CURVE_PATH}" />
+        <path class="fill status-${status}" d="${PROGRESS_CURVE_PATH}" />
+      </svg>
+    `;
+  }
+
+  function setupCurveFill(card, pct) {
+    const path = card.querySelector(".progress-curve .fill");
+    const len = path.getTotalLength();
+    const clamped = Math.max(0, Math.min(1, pct));
+    path.style.strokeDasharray = `${len}`;
+    path.style.strokeDashoffset = `${len * (1 - clamped)}`;
+  }
+
   // ---------- streak + goal ----------
   function renderStreak() {
     const card = document.getElementById("streak-card");
@@ -184,28 +204,26 @@
       .filter((s) => s.date === today)
       .reduce((sum, s) => sum + s.attempted, 0);
     const goal = settings.dailyGoal || 0;
+    const todaysFill = goal > 0 ? attemptedToday / goal : 0;
 
+    let status;
+    if (streak.current === 0) status = "red";
+    else if (streak.current <= 2) status = "amber";
+    else status = "green";
+
+    card.className = `card progress-card status-${status}`;
     card.innerHTML = `
-      <div class="hero">
-        <div class="hero-label">Daily streak</div>
-        <div class="hero-number">${streak.current}</div>
-        <div class="hero-sub">${streak.current === 1 ? "day" : "days"} in a row</div>
-        <div class="stat-row">
-          <div class="stat">
-            <div class="stat-number">${streak.longest}</div>
-            <div class="stat-label">Longest streak</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">${attemptedToday}/${goal || "—"}</div>
-            <div class="stat-label">Today's questions</div>
-          </div>
-        </div>
-        <div class="inline-edit">
-          <label for="daily-goal-input">Daily goal</label>
-          <input type="number" id="daily-goal-input" min="1" step="1" value="${goal}" />
-        </div>
+      <div class="progress-card-top">🔥 <span>Daily streak</span></div>
+      ${progressCurveSvg(status)}
+      <div class="progress-status-line">${streak.current} ${streak.current === 1 ? "day" : "days"} in a row</div>
+      <div class="progress-substatus">${attemptedToday}/${goal || "—"} questions today · longest ${streak.longest}</div>
+      <div class="inline-edit">
+        <label for="daily-goal-input">Daily goal</label>
+        <input type="number" id="daily-goal-input" min="1" step="1" value="${goal}" />
       </div>
     `;
+
+    setupCurveFill(card, todaysFill);
 
     document.getElementById("daily-goal-input").addEventListener("change", (e) => {
       const value = parseInt(e.target.value, 10);
@@ -214,6 +232,109 @@
       saveSettings(s);
       renderStreak();
     });
+  }
+
+  // ---------- readiness band ----------
+  function computeReadiness() {
+    const sessions = getSessions();
+    const totals = sessions.reduce(
+      (acc, s) => {
+        acc.attempted += s.attempted;
+        acc.correct += s.correct;
+        return acc;
+      },
+      { attempted: 0, correct: 0 }
+    );
+
+    if (totals.attempted === 0) {
+      return { hasData: false, pct: 0, band: null, status: "neutral" };
+    }
+
+    const pct = totals.correct / totals.attempted;
+    let band, status;
+    if (pct < 0.6) {
+      band = "Low";
+      status = "red";
+    } else if (pct < 0.7) {
+      band = "Borderline";
+      status = "amber";
+    } else if (pct < 0.85) {
+      band = "High";
+      status = "green";
+    } else {
+      band = "Very High";
+      status = "green";
+    }
+
+    return { hasData: true, pct, band, status };
+  }
+
+  function renderReadiness() {
+    const card = document.getElementById("readiness-card");
+    if (!card) return;
+
+    const settings = getSettings();
+    const readiness = computeReadiness();
+
+    let daysText = "";
+    if (settings.examDate) {
+      const diff = daysBetween(todayStr(), settings.examDate);
+      if (diff > 0) daysText = ` · ${diff} day${diff === 1 ? "" : "s"} to exam`;
+      else if (diff === 0) daysText = " · exam day is today";
+      else daysText = " · exam date passed";
+    }
+
+    const statusLine = readiness.hasData
+      ? `${readiness.band} readiness${daysText}`
+      : `Log a session to see your readiness${daysText}`;
+
+    const substatus = readiness.hasData
+      ? `${Math.round(readiness.pct * 100)}% overall accuracy`
+      : "Based on overall accuracy across logged sessions";
+
+    card.className = `card progress-card status-${readiness.status}`;
+    card.innerHTML = `
+      <div class="progress-card-top">🎯 <span>Readiness band</span></div>
+      ${progressCurveSvg(readiness.status)}
+      <div class="progress-status-line">${statusLine}</div>
+      <div class="progress-substatus">${substatus}</div>
+    `;
+
+    setupCurveFill(card, readiness.hasData ? readiness.pct : 0);
+  }
+
+  // ---------- encouragement ----------
+  const ENCOURAGEMENT_LINES = [
+    "You've got this 💪",
+    "Small steps still move you forward.",
+    "Future-you is already proud of today's work.",
+    "Progress, not perfection.",
+    "One more session, one step closer."
+  ];
+
+  function renderEncouragement() {
+    const el = document.getElementById("encouragement-card");
+    if (!el) return;
+    const dayIndex = Math.floor(Date.now() / 86400000);
+    el.textContent = ENCOURAGEMENT_LINES[dayIndex % ENCOURAGEMENT_LINES.length];
+  }
+
+  // ---------- tab navigation ----------
+  function showScreen(tab) {
+    document.querySelectorAll(".screen").forEach((el) => {
+      el.hidden = el.dataset.screen !== tab;
+    });
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.tab === tab);
+    });
+    if (tab === "progress") renderReadiness();
+  }
+
+  function initNav() {
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => showScreen(btn.dataset.tab));
+    });
+    showScreen("home");
   }
 
   // ---------- log a session ----------
@@ -403,6 +524,9 @@
     renderCountdown();
     renderStreak();
     renderSessionList();
+    renderEncouragement();
+    renderReadiness();
+    initNav();
 
     document.getElementById("session-form").addEventListener("submit", handleSessionSubmit);
     document.getElementById("session-attempted").addEventListener("input", updateAccuracyPreview);

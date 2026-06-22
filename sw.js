@@ -1,6 +1,6 @@
 // Bump this after every deploy so returning visitors pick up new files
 // instead of getting stuck on a stale cached copy.
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `usrnsie-${CACHE_VERSION}`;
 
 const FILES_TO_CACHE = [

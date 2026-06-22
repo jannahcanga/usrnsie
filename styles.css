@@ -1,15 +1,20 @@
 :root {
-  --bg-1: #1b1f3b;
-  --bg-2: #2c1f4a;
-  --accent: #8a7dfb;
-  --accent-2: #6ed0c2;
-  --glass: rgba(255, 255, 255, 0.1);
-  --glass-strong: rgba(255, 255, 255, 0.16);
-  --glass-border: rgba(255, 255, 255, 0.22);
-  --text: #f3f2ff;
-  --text-dim: rgba(243, 242, 255, 0.65);
+  --bg-1: #0f0a1a;
+  --bg-2: #2a1454;
+  --accent: #a855f7;
+  --accent-2: #c084fc;
+  --glass: rgba(255, 255, 255, 0.08);
+  --glass-strong: rgba(255, 255, 255, 0.14);
+  --glass-border: rgba(196, 160, 255, 0.22);
+  --text: #f5f1ff;
+  --text-dim: rgba(245, 241, 255, 0.65);
   --danger: #ff8a8a;
   --success: #8af0c2;
+
+  --status-green: #4ade80;
+  --status-amber: #fbbf24;
+  --status-red: #f87171;
+  --status-neutral: #cbb6ff;
 }
 
 * {
@@ -33,16 +38,16 @@ body {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at 15% 20%, rgba(138, 125, 251, 0.45), transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(110, 208, 194, 0.35), transparent 40%),
-    radial-gradient(circle at 50% 90%, rgba(255, 122, 200, 0.25), transparent 45%),
+    radial-gradient(circle at 18% 15%, rgba(168, 85, 247, 0.4), transparent 45%),
+    radial-gradient(circle at 85% 25%, rgba(124, 58, 237, 0.32), transparent 42%),
+    radial-gradient(circle at 50% 95%, rgba(192, 132, 252, 0.22), transparent 50%),
     linear-gradient(160deg, var(--bg-1), var(--bg-2));
 }
 
 .app {
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px 16px 64px;
+  padding: 24px 16px 140px;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -65,6 +70,16 @@ body {
   font-size: 0.95rem;
 }
 
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
 .card {
   background: var(--glass);
   border: 1px solid var(--glass-border);
@@ -72,7 +87,7 @@ body {
   padding: 20px;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .card h2 {
@@ -86,7 +101,7 @@ body {
   color: var(--text-dim);
 }
 
-/* Countdown + streak shared "hero number" look */
+/* Countdown "hero number" look */
 .hero {
   text-align: center;
 }
@@ -120,24 +135,118 @@ body {
   color: var(--text-dim);
 }
 
-.stat-row {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 4px;
-}
-
-.stat {
+/* Reference-B style progress cards (streak + readiness) */
+.progress-card {
+  position: relative;
   text-align: center;
+  transition: box-shadow 0.4s ease;
 }
 
-.stat .stat-number {
-  font-size: 1.6rem;
+.progress-card.status-green {
+  box-shadow: 0 0 50px 8px rgba(74, 222, 128, 0.28), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.progress-card.status-amber {
+  box-shadow: 0 0 50px 8px rgba(251, 191, 36, 0.26), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.progress-card.status-red {
+  box-shadow: 0 0 50px 8px rgba(248, 113, 113, 0.3), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.progress-card.status-neutral {
+  box-shadow: 0 0 40px 6px rgba(203, 182, 255, 0.18), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.progress-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.progress-curve {
+  width: 100%;
+  height: 64px;
+  margin: 8px 0 4px;
+  overflow: visible;
+}
+
+.progress-curve .track {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 5;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.progress-curve .fill {
+  stroke-width: 5;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.7s ease;
+}
+
+.progress-curve .fill.status-green {
+  stroke: var(--status-green);
+  filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.9));
+}
+
+.progress-curve .fill.status-amber {
+  stroke: var(--status-amber);
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.9));
+}
+
+.progress-curve .fill.status-red {
+  stroke: var(--status-red);
+  filter: drop-shadow(0 0 6px rgba(248, 113, 113, 0.9));
+}
+
+.progress-curve .fill.status-neutral {
+  stroke: var(--status-neutral);
+  filter: drop-shadow(0 0 6px rgba(203, 182, 255, 0.7));
+}
+
+.progress-status-line {
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
-.stat .stat-label {
-  font-size: 0.78rem;
+.progress-substatus {
+  margin-top: 4px;
+  font-size: 0.8rem;
   color: var(--text-dim);
+}
+
+/* Placeholder / "coming soon" cards */
+.placeholder-card {
+  text-align: center;
+  padding: 46px 20px;
+  color: var(--text-dim);
+}
+
+.placeholder-card .placeholder-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+.placeholder-card h3 {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.placeholder-card p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+/* Encouragement line */
+.encouragement-card {
+  text-align: center;
+  padding: 16px 20px;
+  font-size: 0.95rem;
 }
 
 /* Forms */
@@ -184,7 +293,7 @@ input::-webkit-calendar-picker-indicator {
 }
 
 select option {
-  color: #1b1f3b;
+  color: #1b1024;
 }
 
 textarea {
@@ -210,7 +319,7 @@ button {
   border-radius: 14px;
   font-size: 1rem;
   font-weight: 600;
-  color: #1b1f3b;
+  color: #1b1024;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
 }
 
@@ -313,6 +422,66 @@ button {
   font-size: 0.85rem;
   text-align: center;
   padding: 10px 0;
+}
+
+/* Floating bottom nav (Reference A) */
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 8px;
+  border-radius: 999px;
+  background: rgba(20, 10, 35, 0.65);
+  border: 1px solid rgba(196, 160, 255, 0.25);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}
+
+.nav-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.nav-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-btn.active {
+  color: var(--text);
+  background: rgba(168, 85, 247, 0.22);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 16px 4px rgba(168, 85, 247, 0.65);
+}
+
+.nav-btn-center {
+  width: 58px;
+  height: 58px;
+  margin-top: -20px;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #1b1024;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 10px 26px rgba(168, 85, 247, 0.55);
+}
+
+.nav-btn-center.active {
+  box-shadow: 0 0 0 2px #fff, 0 10px 30px rgba(168, 85, 247, 0.8);
 }
 
 @media (min-width: 540px) {

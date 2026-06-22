@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>USRNsie</title>
-  <meta name="theme-color" content="#1b1f3b" />
+  <meta name="theme-color" content="#0f0a1a" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon.svg" />
@@ -19,65 +19,129 @@
       <p class="tagline">Your study companion</p>
     </header>
 
-    <section class="card" id="countdown-card"></section>
+    <!-- Home -->
+    <section class="screen" data-screen="home">
+      <section class="card" id="countdown-card"></section>
+      <section class="card" id="streak-card"></section>
+      <section class="card encouragement-card" id="encouragement-card"></section>
 
-    <section class="card" id="streak-card"></section>
-
-    <section class="card" id="log-card">
-      <h2>Log a session</h2>
-      <form id="session-form" novalidate>
-        <label class="field">
-          <span>Date</span>
-          <input type="date" id="session-date" required />
-        </label>
-
-        <label class="field">
-          <span>Subject</span>
-          <select id="session-subject" required></select>
-        </label>
-
-        <div class="field-row">
-          <label class="field">
-            <span>Questions attempted</span>
-            <input type="number" id="session-attempted" min="1" step="1" inputmode="numeric" required />
-          </label>
-          <label class="field">
-            <span>Correct</span>
-            <input type="number" id="session-correct" min="0" step="1" inputmode="numeric" required />
+      <section class="card" id="backup-card">
+        <h2>Backup</h2>
+        <p class="hint">Export your data regularly — phones can clear app storage without warning.</p>
+        <div class="backup-actions">
+          <button id="export-btn" type="button" class="secondary-btn">Export backup</button>
+          <label class="secondary-btn file-btn">
+            Import backup
+            <input type="file" id="import-input" accept="application/json" hidden />
           </label>
         </div>
-
-        <p class="accuracy-preview" id="accuracy-preview"></p>
-
-        <label class="field">
-          <span>Note (optional)</span>
-          <textarea id="session-note" rows="2" placeholder="Anything worth remembering"></textarea>
-        </label>
-
-        <p class="form-error" id="session-error" role="alert"></p>
-        <button type="submit" class="primary-btn">Save session</button>
-      </form>
-
-      <div class="session-history">
-        <h3>Recent sessions</h3>
-        <ul id="session-list" class="session-list"></ul>
-      </div>
+        <p class="form-error" id="backup-error" role="alert"></p>
+        <p class="form-success" id="backup-success" role="status"></p>
+      </section>
     </section>
 
-    <section class="card" id="backup-card">
-      <h2>Backup</h2>
-      <p class="hint">Export your data regularly — phones can clear app storage without warning.</p>
-      <div class="backup-actions">
-        <button id="export-btn" type="button" class="secondary-btn">Export backup</button>
-        <label class="secondary-btn file-btn">
-          Import backup
-          <input type="file" id="import-input" accept="application/json" hidden />
-        </label>
-      </div>
-      <p class="form-error" id="backup-error" role="alert"></p>
-      <p class="form-success" id="backup-success" role="status"></p>
+    <!-- Progress -->
+    <section class="screen" data-screen="progress" hidden>
+      <section class="card" id="readiness-card"></section>
+
+      <section class="card placeholder-card">
+        <div class="placeholder-icon">📊</div>
+        <h3>Weak-area breakdown</h3>
+        <p>Coming soon — this will surface your lowest-accuracy subjects.</p>
+      </section>
+    </section>
+
+    <!-- Log -->
+    <section class="screen" data-screen="log" hidden>
+      <section class="card" id="log-card">
+        <h2>Log a session</h2>
+        <form id="session-form" novalidate>
+          <label class="field">
+            <span>Date</span>
+            <input type="date" id="session-date" required />
+          </label>
+
+          <label class="field">
+            <span>Subject</span>
+            <select id="session-subject" required></select>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Questions attempted</span>
+              <input type="number" id="session-attempted" min="1" step="1" inputmode="numeric" required />
+            </label>
+            <label class="field">
+              <span>Correct</span>
+              <input type="number" id="session-correct" min="0" step="1" inputmode="numeric" required />
+            </label>
+          </div>
+
+          <p class="accuracy-preview" id="accuracy-preview"></p>
+
+          <label class="field">
+            <span>Note (optional)</span>
+            <textarea id="session-note" rows="2" placeholder="Anything worth remembering"></textarea>
+          </label>
+
+          <p class="form-error" id="session-error" role="alert"></p>
+          <button type="submit" class="primary-btn">Save session</button>
+        </form>
+
+        <div class="session-history">
+          <h3>Recent sessions</h3>
+          <ul id="session-list" class="session-list"></ul>
+        </div>
+      </section>
+    </section>
+
+    <!-- Reference -->
+    <section class="screen" data-screen="reference" hidden>
+      <section class="card placeholder-card">
+        <div class="placeholder-icon">📖</div>
+        <h3>Reference cards</h3>
+        <p>Coming soon — lab values, mnemonics, and drug-class cheat sheets you can flip through.</p>
+      </section>
+    </section>
+
+    <!-- Flashcards -->
+    <section class="screen" data-screen="flashcards" hidden>
+      <section class="card placeholder-card">
+        <div class="placeholder-icon">🗂️</div>
+        <h3>Flashcards are coming soon</h3>
+        <p>This tab is reserved — flashcard decks will show up here in a future update.</p>
+      </section>
     </section>
   </main>
+
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn" data-tab="home" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 11.5 12 4l9 7.5" />
+        <path d="M5 10.5V20h5v-5h4v5h5V10.5" />
+      </svg>
+    </button>
+    <button class="nav-btn" data-tab="progress" aria-label="Progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 20V4" />
+        <path d="M4 20h16" />
+        <path d="M7 16l3.5-4 3 2.5L19 8" />
+      </svg>
+    </button>
+    <button class="nav-btn nav-btn-center" data-tab="log" aria-label="Log a session">+</button>
+    <button class="nav-btn" data-tab="reference" aria-label="Reference">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 5.5c0 0 4-1.5 8 .5 4-2 8-.5 8-.5v13c0 0-4-1.5-8 .5-4-2-8-.5-8-.5Z" />
+        <path d="M12 6v13" />
+      </svg>
+    </button>
+    <button class="nav-btn" data-tab="flashcards" aria-label="Flashcards">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="4" width="12" height="10" rx="2" />
+        <rect x="4" y="8" width="12" height="10" rx="2" />
+      </svg>
+    </button>
+  </nav>
 
   <script src="subjects.js"></script>
   <script src="app.js"></script>
