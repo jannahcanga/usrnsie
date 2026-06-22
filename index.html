@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>USRNsie</title>
+  <meta name="theme-color" content="#1b1f3b" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+
+  <main class="app">
+    <header class="app-header">
+      <h1>USRNsie</h1>
+      <p class="tagline">Your study companion</p>
+    </header>
+
+    <section class="card" id="countdown-card"></section>
+
+    <section class="card" id="streak-card"></section>
+
+    <section class="card" id="log-card">
+      <h2>Log a session</h2>
+      <form id="session-form" novalidate>
+        <label class="field">
+          <span>Date</span>
+          <input type="date" id="session-date" required />
+        </label>
+
+        <label class="field">
+          <span>Subject</span>
+          <select id="session-subject" required></select>
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span>Questions attempted</span>
+            <input type="number" id="session-attempted" min="1" step="1" inputmode="numeric" required />
+          </label>
+          <label class="field">
+            <span>Correct</span>
+            <input type="number" id="session-correct" min="0" step="1" inputmode="numeric" required />
+          </label>
+        </div>
+
+        <p class="accuracy-preview" id="accuracy-preview"></p>
+
+        <label class="field">
+          <span>Note (optional)</span>
+          <textarea id="session-note" rows="2" placeholder="Anything worth remembering"></textarea>
+        </label>
+
+        <p class="form-error" id="session-error" role="alert"></p>
+        <button type="submit" class="primary-btn">Save session</button>
+      </form>
+
+      <div class="session-history">
+        <h3>Recent sessions</h3>
+        <ul id="session-list" class="session-list"></ul>
+      </div>
+    </section>
+
+    <section class="card" id="backup-card">
+      <h2>Backup</h2>
+      <p class="hint">Export your data regularly — phones can clear app storage without warning.</p>
+      <div class="backup-actions">
+        <button id="export-btn" type="button" class="secondary-btn">Export backup</button>
+        <label class="secondary-btn file-btn">
+          Import backup
+          <input type="file" id="import-input" accept="application/json" hidden />
+        </label>
+      </div>
+      <p class="form-error" id="backup-error" role="alert"></p>
+      <p class="form-success" id="backup-success" role="status"></p>
+    </section>
+  </main>
+
+  <script src="subjects.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
